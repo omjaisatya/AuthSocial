@@ -40,18 +40,32 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
+      - name: Generate JS Bundle
+        run: |
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res/
+
       - name: Fix Gradle permissions
         run: chmod +x android/gradlew
 
       - name: Clean Gradle
         run: cd android && ./gradlew clean
 
-      - name: Build Android
+      - name: Build Android with Google Service
         run: |
-          echo $GOOGLE_SERVICES_JSON > android/app/google-services.json
-          cd android && ./gradlew assembleRelease\
+          echo ${{ secrets.GOOGLE_SERVICES_JSON }} | base64 -d > android/app/google-services.json
+             cd android && ./gradlew assembleRelease --no-daemon --max-workers 2
+
+      - name: Build Android Release Simple
+        run: |
+          cd android
+          ./gradlew assembleRelease \
             --warning-mode all \
-            -Dorg.gradle.java.home=$JAVA_HOME_17_X64
+             -Dorg.gradle.java.home=$JAVA_HOME_17_X64
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
