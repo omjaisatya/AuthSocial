@@ -22,6 +22,9 @@ DerivedData
 *.xcuserstate
 **/.xcode.env.local
 
+android/app/google-services.json
+ios/GoogleService-Info.plist
+android_base64.txt
 # Android/IntelliJ
 #
 build/
