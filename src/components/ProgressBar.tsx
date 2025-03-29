@@ -21,19 +21,7 @@ const ProgressBar = ({progress = '20%'}) => {
 
 const styles = StyleSheet.create({
   progressBar: {
-    // width: '100%',
-    // height: 6,
-    // backgroundColor: '#E0E0E0',
-    // borderRadius: 3,
     marginBottom: 40,
-
-    // width: '90%',
-    // height: 4,
-    // backgroundColor: '#EAEAEA',
-    // borderRadius: 2,
-    // marginVertical: height * 0.09,
-    // marginLeft: '5%',
-
     width: '90%',
     height: PROGRESS_HEIGHT,
     backgroundColor: '#EAEAEA',

@@ -31,7 +31,6 @@ const verticalScale = (size: number) => {
 
 const INPUT_HEIGHT = verticalScale(50);
 const BUTTON_PADDING = verticalScale(15);
-const PROGRESS_HEIGHT = verticalScale(4);
 
 type NameScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Name'>;
 type NameScreenRouteProp = RouteProp<RootStackParamList, 'Name'>;
