@@ -38,6 +38,7 @@ export const signInWithGoogle = async (): Promise<UserData | null> => {
       name: userCredential.user.displayName || 'Unknown',
       email: userCredential.user.email || '',
       photo: userCredential.user.photoURL || '',
+      provider: 'Google',
     };
 
     // google sign

@@ -16,20 +16,13 @@ import AppLoadingScreen from '../components/AppLoadingScreen';
 
 const {width, height} = Dimensions.get('window');
 
-const scaleFont = (size: number) => {
-  const scaleFactor = width / 375;
-  return Math.round(size * Math.min(scaleFactor, 1.8));
-};
+const scaleSize = (size: number) => (size / 375) * width;
+const scaleFont = (size: number) => Math.round(size * (width / 375));
+const verticalScale = (size: number) => (size / 812) * height;
+const moderateScale = (size: number, factor = 0.5) =>
+  size + (scaleFont(size) - size) * factor;
 
-const verticalScale = (size: number) => {
-  return (size / 812) * height;
-};
-
-const moderateScale = (size: number, factor = 0.5) => {
-  return size + (scaleFont(size) - size) * factor;
-};
-
-const PROFILE_IMAGE_SIZE = verticalScale(100);
+const PROFILE_IMAGE_SIZE = moderateScale(100);
 const BUTTON_PADDING = verticalScale(15);
 const CONTAINER_PADDING = width * 0.05;
 
@@ -42,24 +35,19 @@ interface Props {
 const HomeScreen: React.FC<Props> = ({navigation}) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const loadUserData = async () => {
-    try {
-      const data = await getUserData();
-      if (data) {
-        setUserData(data);
-      }
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      Alert.alert('Error', 'Failed to load user data');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
 
   useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const data = await getUserData();
+        setUserData(data);
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        Alert.alert('Error', 'Failed to load user data');
+      } finally {
+        setLoading(false);
+      }
+    };
     loadUserData();
   }, []);
 
@@ -67,10 +55,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
     try {
       await clearUserData();
       await GoogleSignin.signOut();
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'Welcome'}],
-      });
+      navigation.reset({index: 0, routes: [{name: 'Welcome'}]});
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Error', 'Failed to logout');
@@ -90,9 +75,19 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Image source={{uri: userData?.photo}} style={styles.profileImage} />
-      <Text style={styles.title}>{userData?.name || 'Undefine User'}</Text>
-      <Text style={styles.email}>{userData?.email || ''}</Text>
+      {userData?.photo ? (
+        <Image source={{uri: userData.photo}} style={styles.profileImage} />
+      ) : (
+        <View style={styles.placeholderImage}>
+          <Text style={styles.placeholderText}>No Image</Text>
+        </View>
+      )}
+
+      <Text style={styles.title}>{userData?.name || 'Undefined User'}</Text>
+      <Text style={styles.email}>{userData?.email || 'N/A'}</Text>
+      <Text style={styles.provider}>
+        Logged in with: {userData?.provider || 'Unknown'}
+      </Text>
 
       <Text style={styles.text}>Age: {userData?.age || 'N/A'}</Text>
       <Text style={styles.text}>Gender: {userData?.gender || 'N/A'}</Text>
@@ -107,24 +102,18 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',
     paddingHorizontal: CONTAINER_PADDING,
     paddingTop: verticalScale(40),
+    alignItems: 'center',
   },
   profileImage: {
     width: PROFILE_IMAGE_SIZE,
     height: PROFILE_IMAGE_SIZE,
     borderRadius: PROFILE_IMAGE_SIZE / 2,
     marginBottom: verticalScale(15),
-    alignSelf: 'center',
   },
   placeholderImage: {
     width: PROFILE_IMAGE_SIZE,
@@ -134,7 +123,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: verticalScale(15),
-    alignSelf: 'center',
   },
   placeholderText: {
     color: '#888',
@@ -147,30 +135,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#2D3436',
   },
+  email: {
+    fontSize: scaleFont(16),
+    color: '#636E72',
+    marginBottom: verticalScale(10),
+    textAlign: 'center',
+  },
+  provider: {
+    fontSize: scaleFont(14),
+    color: '#888',
+    marginBottom: verticalScale(10),
+  },
   text: {
     fontSize: scaleFont(18),
     marginBottom: verticalScale(5),
     color: '#636E72',
     textAlign: 'center',
   },
-  email: {
-    fontSize: scaleFont(16),
-    color: '#636E72',
-    marginBottom: verticalScale(20),
-    textAlign: 'center',
-  },
   logoutButton: {
     marginTop: verticalScale(20),
     backgroundColor: '#d9534f',
-    padding: BUTTON_PADDING,
+    paddingVertical: BUTTON_PADDING,
+    paddingHorizontal: scaleSize(50),
     borderRadius: moderateScale(8),
-    alignSelf: 'center',
-    width: '80%',
+    alignItems: 'center',
   },
   logoutText: {
     color: 'white',
     fontSize: scaleFont(16),
-    textAlign: 'center',
     fontWeight: '600',
   },
 });

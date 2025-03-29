@@ -6,6 +6,7 @@ export interface UserData {
   gender?: string;
   email?: string;
   photo?: string;
+  provider?: string;
 }
 
 const USER_DATA_KEY = '@UserData';
