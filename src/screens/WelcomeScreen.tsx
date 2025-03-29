@@ -13,6 +13,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {signInWithGoogle} from '../services/authService';
 import GradientText from '../components/GradientText';
+import ProgressBar from '../components/ProgressBar';
 
 const {width, height} = Dimensions.get('window');
 
@@ -42,9 +43,7 @@ const WelcomeScreen: React.FC<Props> = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar} />
-        </View>
+        <ProgressBar progress="10%" />
         <View style={styles.textContainer}>
           <GradientText style={styles.title} boldText="Mindful Journey">
             Begin Your {'\n'}
@@ -104,20 +103,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-  },
-  progressContainer: {
-    width: '90%',
-    height: 4,
-    backgroundColor: '#EAEAEA',
-    borderRadius: 2,
-    marginVertical: height * 0.09,
-    marginLeft: '5%',
-  },
-  progressBar: {
-    width: '20%',
-    height: '100%',
-    backgroundColor: '#FF9A5A',
-    borderRadius: 2,
   },
   textContainer: {
     flex: 1,

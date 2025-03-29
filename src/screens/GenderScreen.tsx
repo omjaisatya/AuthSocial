@@ -11,6 +11,9 @@ import {
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {saveUserData, getUserData} from '../services/storageService';
+import Svg, {Path} from 'react-native-svg';
+import ContinueButton from '../components/ContinueButton';
+import ProgressBar from '../components/ProgressBar';
 
 const {width, height} = Dimensions.get('window');
 
@@ -23,8 +26,8 @@ const verticalScale = (size: number) => (size / 812) * height;
 const moderateScale = (size: number, factor = 0.5) =>
   size + (scaleFont(size) - size) * factor;
 
-const CONTAINER_PADDING = width * 0.05;
-const OPTION_WIDTH = width * 0.8;
+const OPTION_WIDTH = width * 0.9;
+const INPUT_HEIGHT = verticalScale(50);
 const BUTTON_PADDING = verticalScale(15);
 
 type GenderScreenNavigationProp = StackNavigationProp<
@@ -76,54 +79,48 @@ const GenderScreen: React.FC<Props> = ({navigation}) => {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007BFF" />
+        <ActivityIndicator size="large" color="#FF69B4" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select Your Gender</Text>
+      <ProgressBar progress="10%" />
 
-      <TouchableOpacity
-        style={[styles.option, gender === 'Male' && styles.selectedOption]}
-        onPress={() => setGender('Male')}>
-        <Text
-          style={[styles.optionText, gender === 'Male' && styles.selectedText]}>
-          Male
+      <View style={styles.textContainer}>
+        <Text style={styles.heading}>
+          Choose the <Text style={styles.highlight}>identity</Text> that {'\n'}
+          feels right for <Text style={styles.bold}> You?</Text>
         </Text>
-      </TouchableOpacity>
+        <Svg height="20" width="45" style={styles.curvedLine}>
+          <Path
+            d="M 45 10 C 18 -2 11 -1 8 5"
+            stroke="#FF69B4"
+            strokeWidth="3"
+            fill="none"
+          />
+        </Svg>
+      </View>
 
-      <TouchableOpacity
-        style={[styles.option, gender === 'Female' && styles.selectedOption]}
-        onPress={() => setGender('Female')}>
-        <Text
-          style={[
-            styles.optionText,
-            gender === 'Female' && styles.selectedText,
-          ]}>
-          Female
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.optionContainer}>
+        {['Male', 'Female', 'Other'].map(item => (
+          <TouchableOpacity
+            key={item}
+            style={[styles.option, gender === item && styles.selectedOption]}
+            onPress={() => setGender(item)}>
+            <Text
+              style={[
+                styles.optionText,
+                gender === item && styles.selectedText,
+              ]}>
+              {item}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      <TouchableOpacity
-        style={[styles.option, gender === 'Other' && styles.selectedOption]}
-        onPress={() => setGender('Other')}>
-        <Text
-          style={[
-            styles.optionText,
-            gender === 'Other' && styles.selectedText,
-          ]}>
-          Other
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.button, !gender && styles.disabledButton]}
-        onPress={handleContinue}
-        disabled={!gender}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
+      <ContinueButton onPress={handleContinue} disabled={!gender} />
     </View>
   );
 };
@@ -133,51 +130,99 @@ export default GenderScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    paddingHorizontal: CONTAINER_PADDING,
+  },
+  subtitle: {
+    fontSize: scaleFont(14),
+    color: '#777',
+    marginBottom: verticalScale(10),
+    textAlign: 'center',
+    lineHeight: moderateScale(20),
   },
   title: {
     fontSize: moderateScale(24),
     fontWeight: 'bold',
-    marginBottom: verticalScale(20),
     color: '#333',
     textAlign: 'center',
+    marginBottom: verticalScale(20),
+    lineHeight: moderateScale(32),
+  },
+  textContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  heading: {
+    fontSize: scaleFont(28),
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: verticalScale(30),
+  },
+  highlight: {
+    color: '#FF9A5A',
+    fontWeight: 'bold',
+  },
+  bold: {
+    fontWeight: 'bold',
+    position: 'relative',
+  },
+  curvedLine: {
+    position: 'absolute',
+    top: verticalScale(80),
+    right: '10%',
+    zIndex: 1,
+    color: '#FF9A5A',
+  },
+  textWithCurve: {
+    position: 'relative',
+    alignItems: 'center',
+  },
+  optionContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: verticalScale(10),
   },
   option: {
     width: OPTION_WIDTH,
-    padding: verticalScale(15),
-    marginVertical: verticalScale(10),
-    backgroundColor: '#e0e0e0',
-    borderRadius: moderateScale(10),
+    paddingVertical: verticalScale(15),
+    backgroundColor: '#E0E0E0',
+    borderRadius: moderateScale(30),
     alignItems: 'center',
+    marginVertical: verticalScale(10),
   },
   selectedOption: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#FFA07A',
   },
   optionText: {
     fontSize: scaleFont(18),
     color: '#333',
   },
   selectedText: {
-    color: '#fff',
+    color: '#FFF',
     fontWeight: 'bold',
   },
-  button: {
-    marginTop: verticalScale(20),
-    padding: BUTTON_PADDING,
-    backgroundColor: '#007BFF',
-    width: OPTION_WIDTH,
+  continueButton: {
+    width: '90%',
+    borderRadius: INPUT_HEIGHT / 2,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    marginBottom: verticalScale(20),
+    paddingVertical: verticalScale(15),
+    marginTop: verticalScale(30),
+    position: 'absolute',
+    bottom: verticalScale(40),
+  },
+  gradientButton: {
+    paddingVertical: BUTTON_PADDING,
     alignItems: 'center',
-    borderRadius: moderateScale(10),
+    borderRadius: INPUT_HEIGHT / 2,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    opacity: 0.5,
   },
   buttonText: {
     fontSize: scaleFont(18),
-    color: '#fff',
+    color: '#FFF',
     fontWeight: 'bold',
   },
 });

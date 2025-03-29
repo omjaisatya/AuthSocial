@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ActivityIndicator,
   Alert,
   Dimensions,
 } from 'react-native';
@@ -13,6 +12,7 @@ import {getUserData, clearUserData, UserData} from '../services/storageService';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
+import AppLoadingScreen from '../components/AppLoadingScreen';
 
 const {width, height} = Dimensions.get('window');
 
@@ -85,11 +85,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
   };
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
-      </View>
-    );
+    return <AppLoadingScreen />;
   }
 
   return (

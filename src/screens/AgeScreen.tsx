@@ -4,13 +4,14 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
-  ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {saveUserData, getUserData} from '../services/storageService';
+import ContinueButton from '../components/ContinueButton';
+import ProgressBar from '../components/ProgressBar';
+import AppLoadingScreen from '../components/AppLoadingScreen';
 
 const {width, height} = Dimensions.get('window');
 
@@ -20,12 +21,11 @@ const scaleFont = (size: number) => {
 };
 
 const verticalScale = (size: number) => (size / 812) * height;
-const moderateScale = (size: number, factor = 0.5) =>
+const moderateScale = (size: number, factor: number = 0.5): number =>
   size + (scaleFont(size) - size) * factor;
 
-const CONTAINER_PADDING = width * 0.05;
-const BUTTON_WIDTH = width * 0.9;
-const PROGRESS_HEIGHT = verticalScale(6);
+const INPUT_HEIGHT = verticalScale(50);
+const BUTTON_PADDING = verticalScale(15);
 
 type AgeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Age'>;
 
@@ -72,23 +72,13 @@ const AgeScreen: React.FC<Props> = ({navigation}) => {
   };
 
   if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#FF69B4" />
-      </View>
-    );
+    return <AppLoadingScreen />;
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.progressBar}>
-        <LinearGradient
-          colors={['#FFA07A', '#FF69B4']}
-          style={styles.progressFill}
-        />
-      </View>
+      <ProgressBar progress="20%" />
 
-      {/* Title */}
       <Text style={styles.subtitle}>Great, Let's make Mynd all about you!</Text>
       <Text style={styles.title}>
         How long have you been rocking this{' '}
@@ -115,12 +105,7 @@ const AgeScreen: React.FC<Props> = ({navigation}) => {
         ))}
       </View>
 
-      <TouchableOpacity
-        style={[styles.continueButton, !selectedAge && styles.disabledButton]}
-        onPress={handleContinue}
-        disabled={!selectedAge}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
+      <ContinueButton onPress={handleContinue} disabled={!selectedAge} />
     </View>
   );
 };
@@ -130,22 +115,6 @@ export default AgeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    paddingHorizontal: CONTAINER_PADDING,
-    paddingTop: verticalScale(40),
-  },
-  progressBar: {
-    width: '100%',
-    height: PROGRESS_HEIGHT,
-    backgroundColor: '#E0E0E0',
-    borderRadius: PROGRESS_HEIGHT / 2,
-    marginTop: verticalScale(40),
-  },
-  progressFill: {
-    width: '20%',
-    height: '100%',
-    borderRadius: PROGRESS_HEIGHT / 2,
   },
   subtitle: {
     fontSize: scaleFont(14),
@@ -153,6 +122,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(30),
     textAlign: 'center',
     lineHeight: moderateScale(20),
+    paddingTop: verticalScale(40),
   },
   title: {
     fontSize: moderateScale(24),
@@ -172,6 +142,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: verticalScale(20),
     gap: verticalScale(8),
+    paddingTop: verticalScale(40),
   },
   ageButton: {
     backgroundColor: '#F5F5F5',
@@ -193,17 +164,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   continueButton: {
-    width: BUTTON_WIDTH,
-    paddingVertical: verticalScale(15),
-    borderRadius: moderateScale(30),
-    marginTop: verticalScale(30),
-    backgroundColor: '#FF69B4',
-    alignItems: 'center',
+    width: '90%',
+    borderRadius: INPUT_HEIGHT / 2,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    marginBottom: verticalScale(20),
     position: 'absolute',
     bottom: verticalScale(40),
   },
   disabledButton: {
-    backgroundColor: '#E0E0E0',
+    opacity: 0.5,
+  },
+  gradientButton: {
+    paddingVertical: BUTTON_PADDING,
+    alignItems: 'center',
+    borderRadius: INPUT_HEIGHT / 2,
   },
   buttonText: {
     fontSize: scaleFont(18),

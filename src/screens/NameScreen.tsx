@@ -3,16 +3,19 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {getUserData, UserData} from '../services/storageService';
+import Svg, {Path} from 'react-native-svg';
+import ContinueButton from '../components/ContinueButton';
+import ProgressBar from '../components/ProgressBar';
 
 const {width, height} = Dimensions.get('window');
 
@@ -24,10 +27,6 @@ const scaleFont = (size: number) => {
 const verticalScale = (size: number) => {
   const scaleFactor = height / 812;
   return Math.round(size * scaleFactor);
-};
-
-const moderateScale = (size: number, factor = 0.5) => {
-  return size + (scaleFont(size) - size) * factor;
 };
 
 const INPUT_HEIGHT = verticalScale(50);
@@ -54,15 +53,13 @@ const NameScreen: React.FC<Props> = ({navigation, route}) => {
       try {
         const userData = await getUserData();
         setStoredUser(userData);
-        const initialName = routeUser?.name || userData?.name || '';
-        setName(initialName);
+        setName(routeUser?.name || userData?.name || '');
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchUserData();
   }, [routeUser]);
 
@@ -81,67 +78,59 @@ const NameScreen: React.FC<Props> = ({navigation, route}) => {
   }
 
   return (
-    <LinearGradient colors={['#FFFFFF', '#FDF2EB']} style={styles.container}>
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar} />
+    <SafeAreaView style={styles.safeContainer}>
+      <View style={styles.container}>
+        <ProgressBar progress="10%" />
+
+        <View style={styles.contentContainer}>
+          <Text style={styles.subHeading}>Let’s get to know each other</Text>
+          <Text style={styles.heading}>
+            <Text style={styles.highlight}>What</Text> Should We Call{' '}
+            <Text style={styles.bold}>You?</Text>
+            <Svg height="20" width="45" style={styles.curvedLine}>
+              <Path
+                d="M 45 10 C 18 -2 11 -1 8 5"
+                stroke="#FF69B4"
+                strokeWidth="3"
+                fill="none"
+              />
+            </Svg>
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            placeholder="Edit your name"
+            editable={false}
+          />
+        </View>
       </View>
-
-      <Text style={styles.subHeading}>Let’s get to know each other</Text>
-      <Text style={styles.heading}>
-        <Text style={styles.highlight}>What</Text> Should We Call{' '}
-        <Text style={styles.bold}>You?</Text>
-      </Text>
-
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Edit your name"
-        editable={false}
-      />
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleContinue}
-        disabled={name.trim() === ''}>
-        <LinearGradient
-          colors={['#FF9A5A', '#FF78C4']}
-          style={styles.gradientButton}>
-          <Text style={styles.buttonText}>Continue</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </LinearGradient>
+      <ContinueButton onPress={handleContinue} disabled={!name.trim()} />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: width * 0.05,
-    paddingTop: verticalScale(60),
-  },
-  progressContainer: {
-    width: '100%',
-    height: PROGRESS_HEIGHT,
-    backgroundColor: '#EAEAEA',
-    borderRadius: PROGRESS_HEIGHT / 2,
-    marginBottom: verticalScale(40),
-  },
-  progressBar: {
-    width: '40%',
-    height: '100%',
-    backgroundColor: '#FF9A5A',
-    borderRadius: PROGRESS_HEIGHT / 2,
+    marginBottom: verticalScale(80),
   },
   subHeading: {
     fontSize: scaleFont(14),
     color: '#777',
     textAlign: 'center',
-    marginBottom: verticalScale(10),
   },
   heading: {
-    fontSize: moderateScale(28),
+    fontSize: scaleFont(28),
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#333',
@@ -153,7 +142,14 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
+    position: 'relative',
+  },
+  curvedLine: {
+    position: 'absolute',
+    top: verticalScale(80),
+    right: '10%',
+    zIndex: 1,
+    color: '#FF9A5A',
   },
   input: {
     width: '90%',
@@ -171,6 +167,8 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: INPUT_HEIGHT / 2,
     overflow: 'hidden',
+    alignSelf: 'center',
+    marginBottom: verticalScale(20),
   },
   gradientButton: {
     paddingVertical: BUTTON_PADDING,
