@@ -35,8 +35,8 @@ A React Native authentication implementation using Google Sign-In
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/omjaisatya/AuthUser.git
-cd AuthUser
+git clone https://github.com/omjaisatya/AuthSocial.git
+cd Authsocial
 ```
 
 ```bash
